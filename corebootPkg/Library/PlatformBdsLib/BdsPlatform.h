@@ -46,7 +46,6 @@ Abstract:
 #include <Library/DxeServicesTableLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/IoLib.h>
-#include <Library/NvVarsFileLib.h>
 
 #include <Protocol/Decompress.h>
 #include <Protocol/PciIo.h>

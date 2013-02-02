@@ -29,16 +29,13 @@
 [Sources]
   BdsPlatform.c
   PlatformData.c
-  QemuBootOrder.c
-  QemuKernel.c
   BdsPlatform.h
-  QemuBootOrder.h
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
-  OvmfPkg/OvmfPkg.dec
+  corebootPkg/corebootPkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -49,14 +46,10 @@
   PcdLib
   GenericBdsLib
   PciLib
-  NvVarsFileLib
-  QemuFwCfgLib
-  LoadLinuxLib
 
 [Pcd]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile
-  gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent
 
 [Pcd.IA32, Pcd.X64]
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock

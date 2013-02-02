@@ -41,6 +41,7 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
+  corebootPkg/corebootPkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -58,3 +59,6 @@
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid                # PPI ALWAYS_PRODUCED
 
+[Pcd]
+  gUefiCorebootPkgTokenSpaceGuid.PcdCorebootMemFvBase
+  gUefiCorebootPkgTokenSpaceGuid.PcdCorebootMemFvSize

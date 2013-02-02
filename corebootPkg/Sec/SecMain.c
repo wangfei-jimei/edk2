@@ -101,26 +101,10 @@ FindMainFv (
   ASSERT (((UINTN) *BootFv & EFI_PAGE_MASK) == 0);
 
   Fv = *BootFv;
-  Distance = (UINTN) (*BootFv)->FvLength;
-  do {
-    Fv = (EFI_FIRMWARE_VOLUME_HEADER*) ((UINT8*) Fv - EFI_PAGE_SIZE);
-    Distance += EFI_PAGE_SIZE;
-    if (Distance > SIZE_32MB) {
-      return EFI_NOT_FOUND;
-    }
-
-    if (Fv->Signature != EFI_FVH_SIGNATURE) {
-      continue;
-    }
-
-    if ((UINTN) Fv->FvLength > Distance) {
-      continue;
-    }
-
-    *BootFv = Fv;
-    return EFI_SUCCESS;
-
-  } while (TRUE);
+  Fv = (EFI_FIRMWARE_VOLUME_HEADER*) ((UINT8*) Fv + (UINTN) Fv->FvLength);
+  ASSERT(Fv->Signature == EFI_FVH_SIGNATURE);
+  *BootFv = Fv;
+  return EFI_SUCCESS;
 }
 
 /**

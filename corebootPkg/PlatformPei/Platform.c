@@ -226,36 +226,6 @@ MiscInitialization (
   // Build the CPU hob with 36-bit addressing and 16-bits of IO space.
   //
   BuildCpuHob (36, 16);
-
-  //
-  // If PMREGMISC/PMIOSE is set, assume the ACPI PMBA has been configured (for
-  // example by Xen) and skip the setup here. This matches the logic in
-  // AcpiTimerLibConstructor ().
-  //
-  if ((PciRead8 (PCI_LIB_ADDRESS (0, 1, 3, 0x80)) & 0x01) == 0) {
-    //
-    // The PEI phase should be exited with fully accessibe PIIX4 IO space:
-    // 1. set PMBA
-    //
-    PciAndThenOr32 (
-      PCI_LIB_ADDRESS (0, 1, 3, 0x40),
-      (UINT32) ~0xFFC0,
-      PcdGet16 (PcdAcpiPmBaseAddress)
-      );
-
-    //
-    // 2. set PCICMD/IOSE
-    //
-    PciOr8 (
-      PCI_LIB_ADDRESS (0, 1, 3, PCI_COMMAND_OFFSET),
-      EFI_PCI_COMMAND_IO_SPACE
-      );
-
-    //
-    // 3. set PMREGMISC/PMIOSE
-    //
-    PciOr8 (PCI_LIB_ADDRESS (0, 1, 3, 0x80), 0x01);
-  }
 }
 
 
@@ -343,10 +313,6 @@ InitializePlatform (
   DebugDumpCmos ();
 
   TopOfMemory = MemDetect ();
-
-  InitializeXen ();
-
-  ReserveEmuVariableNvStore ();
 
   PeiFvInitialization ();
 

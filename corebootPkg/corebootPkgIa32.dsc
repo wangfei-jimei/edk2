@@ -19,34 +19,29 @@
 #
 ################################################################################
 [Defines]
-  PLATFORM_NAME                  = Ovmf
-  PLATFORM_GUID                  = 5a9e7754-d81b-49ea-85ad-69eaa7b1539b
+  PLATFORM_NAME                  = coreboot
+  PLATFORM_GUID                  = 5c87b2d4-0bb9-4f50-a78d-e847089af9f4
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
-  OUTPUT_DIRECTORY               = Build/Ovmf3264
-  SUPPORTED_ARCHITECTURES        = IA32|X64
+  OUTPUT_DIRECTORY               = Build/corebootIa32
+  SUPPORTED_ARCHITECTURES        = IA32
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
-  FLASH_DEFINITION               = OvmfPkg/OvmfPkgIa32X64.fdf
+  FLASH_DEFINITION               = corebootPkg/corebootPkgIa32.fdf
 
   #
   # Defines for default states.  These can be changed on the command line.
   # -D FLAG=VALUE
   #
   DEFINE SECURE_BOOT_ENABLE      = FALSE
+  DEFINE DEBUG_ON_SERIAL_PORT    = TRUE
 
 [BuildOptions]
-  GCC:*_UNIXGCC_*_CC_FLAGS             = -DMDEPKG_NDEBUG
   GCC:RELEASE_*_*_CC_FLAGS             = -DMDEPKG_NDEBUG
   INTEL:RELEASE_*_*_CC_FLAGS           = /D MDEPKG_NDEBUG
   MSFT:RELEASE_*_*_CC_FLAGS            = /D MDEPKG_NDEBUG
   GCC:*_*_*_CC_FLAGS                   = -mno-mmx -mno-sse
-!ifdef $(SOURCE_DEBUG_ENABLE)
-  MSFT:*_*_X64_GENFW_FLAGS  = --keepexceptiontable
-  GCC:*_*_X64_GENFW_FLAGS   = --keepexceptiontable
-  INTEL:*_*_X64_GENFW_FLAGS = --keepexceptiontable
-!endif
-  
+
 ################################################################################
 #
 # SKU Identification section - list of all SKU IDs supported by this Platform.
@@ -62,7 +57,7 @@
 ################################################################################
 [LibraryClasses]
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-  TimerLib|OvmfPkg/Library/AcpiTimerLib/AcpiTimerLib.inf
+  TimerLib|corebootPkg/Library/AcpiTimerLib/AcpiTimerLib.inf
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLibRepStr/BaseMemoryLibRepStr.inf
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
@@ -91,7 +86,6 @@
   UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
-  NvVarsFileLib|OvmfPkg/Library/NvVarsFileLib/NvVarsFileLib.inf
   FileHandleLib|ShellPkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
   UefiCpuLib|UefiCpuPkg/Library/BaseUefiCpuLib/BaseUefiCpuLib.inf
   SecurityManagementLib|MdeModulePkg/Library/DxeSecurityManagementLib/DxeSecurityManagementLib.inf
@@ -100,10 +94,6 @@
   UdpIoLib|MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
   DpcLib|MdeModulePkg/Library/DxeDpcLib/DxeDpcLib.inf
   UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
-  SerializeVariablesLib|OvmfPkg/Library/SerializeVariablesLib/SerializeVariablesLib.inf
-  QemuFwCfgLib|OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgLib.inf
-  VirtioLib|OvmfPkg/Library/VirtioLib/VirtioLib.inf
-  LoadLinuxLib|OvmfPkg/Library/LoadLinuxLib/LoadLinuxLib.inf
   LockBoxLib|MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
 
 !ifdef $(SOURCE_DEBUG_ENABLE)
@@ -114,13 +104,13 @@
   DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
 !endif
 
-  ResetSystemLib|OvmfPkg/Library/ResetSystemLib/ResetSystemLib.inf
+  ResetSystemLib|corebootPkg/Library/ResetSystemLib/ResetSystemLib.inf
   LocalApicLib|UefiCpuPkg/Library/BaseXApicLib/BaseXApicLib.inf
   DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
   CpuExceptionHandlerLib|MdeModulePkg/Library/CpuExceptionHandlerLibNull/CpuExceptionHandlerLibNull.inf
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
-  PlatformSecureLib|OvmfPkg/Library/PlatformSecureLib/PlatformSecureLib.inf
+  PlatformSecureLib|corebootPkg/Library/PlatformSecureLib/PlatformSecureLib.inf
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
 !endif
@@ -134,7 +124,7 @@
 !ifdef $(DEBUG_ON_SERIAL_PORT)
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
 !else
-  DebugLib|OvmfPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
+  DebugLib|corebootPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
 !endif
   ReportStatusCodeLib|MdeModulePkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
   ExtractGuidedSectionLib|MdePkg/Library/BaseExtractGuidedSectionLib/BaseExtractGuidedSectionLib.inf
@@ -158,7 +148,7 @@
 !ifdef $(DEBUG_ON_SERIAL_PORT)
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
 !else
-  DebugLib|OvmfPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
+  DebugLib|corebootPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
 !endif
   PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
 
@@ -174,7 +164,7 @@
 !ifdef $(DEBUG_ON_SERIAL_PORT)
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
 !else
-  DebugLib|OvmfPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
+  DebugLib|corebootPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
 !endif
   PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   PeiResourcePublicationLib|MdePkg/Library/PeiResourcePublicationLib/PeiResourcePublicationLib.inf
@@ -191,7 +181,7 @@
 !ifdef $(DEBUG_ON_SERIAL_PORT)
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
 !else
-  DebugLib|OvmfPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
+  DebugLib|corebootPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
 !endif
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   ExtractGuidedSectionLib|MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
@@ -207,7 +197,7 @@
 !ifdef $(DEBUG_ON_SERIAL_PORT)
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
 !else
-  DebugLib|OvmfPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
+  DebugLib|corebootPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
 !endif
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
@@ -223,7 +213,7 @@
 !ifdef $(DEBUG_ON_SERIAL_PORT)
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
 !else
-  DebugLib|OvmfPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
+  DebugLib|corebootPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
 !endif
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
@@ -237,13 +227,13 @@
 !ifdef $(DEBUG_ON_SERIAL_PORT)
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
 !else
-  DebugLib|OvmfPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
+  DebugLib|corebootPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
 !endif
   NetLib|MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
   IpIoLib|MdeModulePkg/Library/DxeIpIoLib/DxeIpIoLib.inf
   UdpIoLib|MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
   DpcLib|MdeModulePkg/Library/DxeDpcLib/DxeDpcLib.inf
-  PlatformBdsLib|OvmfPkg/Library/PlatformBdsLib/PlatformBdsLib.inf
+  PlatformBdsLib|corebootPkg/Library/PlatformBdsLib/PlatformBdsLib.inf
 
 [LibraryClasses.common.UEFI_APPLICATION]
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -251,7 +241,7 @@
 !ifdef $(DEBUG_ON_SERIAL_PORT)
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
 !else
-  DebugLib|OvmfPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
+  DebugLib|corebootPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
 !endif
 
 ################################################################################
@@ -263,12 +253,9 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportUefiDecompress|FALSE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport|FALSE
-!if $(SECURE_BOOT_ENABLE) == TRUE
-  gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootEnable|TRUE
-!endif
 
 [PcdsFixedAtBuild]
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1
@@ -309,7 +296,6 @@
 !endif
 !endif
 
-[PcdsFixedAtBuild.X64]
 !if $(SECURE_BOOT_ENABLE) == TRUE
   # override the default values from SecurityPkg to ensure images from all sources are verified in secure boot
   gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x05
@@ -338,14 +324,11 @@
 # Components Section - list of all EDK II Modules needed by this Platform.
 #
 ################################################################################
-[Components.IA32]
+[Components]
   #
   # SEC Phase modules
   #
-  OvmfPkg/Sec/SecMain.inf {
-    <LibraryClasses>
-      NULL|IntelFrameworkModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
-  }
+  corebootPkg/Sec/SecMain.inf
 
   #
   # PEI Phase modules
@@ -358,12 +341,11 @@
   IntelFrameworkModulePkg/Universal/StatusCode/Pei/StatusCodePei.inf
   MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
-  OvmfPkg/PlatformPei/PlatformPei.inf {
+  corebootPkg/PlatformPei/PlatformPei.inf {
     <LibraryClasses>
       PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
   }
 
-[Components.X64]
   #
   # DXE Phase modules
   #
@@ -399,25 +381,23 @@
   PcAtChipsetPkg/KbcResetDxe/Reset.inf
   MdeModulePkg/Universal/Metronome/Metronome.inf {
     <LibraryClasses>
-      TimerLib|OvmfPkg/Library/AcpiTimerLib/AcpiTimerLib.inf
+      TimerLib|corebootPkg/Library/AcpiTimerLib/AcpiTimerLib.inf
   }
 
   PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf {
     <LibraryClasses>
-      TimerLib|OvmfPkg/Library/AcpiTimerLib/AcpiTimerLib.inf
+      TimerLib|corebootPkg/Library/AcpiTimerLib/AcpiTimerLib.inf
   }
 
   IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf {
     <LibraryClasses>
-      TimerLib|OvmfPkg/Library/AcpiTimerLib/AcpiTimerLib.inf
+      TimerLib|corebootPkg/Library/AcpiTimerLib/AcpiTimerLib.inf
 !ifdef $(CSM_ENABLE)
-      NULL|OvmfPkg/Csm/CsmSupportLib/CsmSupportLib.inf
+      NULL|corebootPkg/Csm/CsmSupportLib/CsmSupportLib.inf
 !endif
   }
 
-  OvmfPkg/BlockMmioToBlockIoDxe/BlockIo.inf
-  OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
-  OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
+  # FIXME: remove and replace with real flash driver
   OvmfPkg/EmuVariableFvbRuntimeDxe/Fvb.inf {
     <LibraryClasses>
       PlatformFvbLib|OvmfPkg/Library/EmuVariableFvbLib/EmuVariableFvbLib.inf
@@ -444,11 +424,6 @@
   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
   MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
 
-  OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf {
-    <LibraryClasses>
-      BltLib|OptionRomPkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
-  }
-
   #
   # ISA Support
   #
@@ -462,14 +437,12 @@
   # SMBIOS Support
   #
   MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
-  OvmfPkg/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
+  corebootPkg/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
 
   #
   # ACPI Support
   #
   MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
-  OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
-  OvmfPkg/AcpiTables/AcpiTables.inf
 
   #
   # Network Support
@@ -502,7 +475,7 @@
 !ifdef $(CSM_ENABLE)
   IntelFrameworkModulePkg/Csm/BiosThunk/VideoDxe/VideoDxe.inf
   IntelFrameworkModulePkg/Csm/LegacyBiosDxe/LegacyBiosDxe.inf
-  OvmfPkg/Csm/Csm16/Csm16.inf
+  corebootPkg/Csm/Csm16/Csm16.inf
 !endif
 
 !if $(BUILD_NEW_SHELL)
@@ -538,5 +511,4 @@
       BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
       OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   }
-  OvmfPkg/SecureBootConfigDxe/SecureBootConfigDxe.inf
 !endif

@@ -37,19 +37,19 @@ PeiFvInitialization (
 
   DEBUG (
     (EFI_D_ERROR, "Firmware Volume HOB: 0x%x 0x%x\n",
-      PcdGet32 (PcdOvmfMemFvBase),
-      PcdGet32 (PcdOvmfMemFvSize)
+      PcdGet32 (PcdCorebootMemFvBase),
+      PcdGet32 (PcdCorebootMemFvSize)
       )
     );
 
-  BuildFvHob (PcdGet32 (PcdOvmfMemFvBase), PcdGet32 (PcdOvmfMemFvSize));
+  BuildFvHob (PcdGet32 (PcdCorebootMemFvBase), PcdGet32 (PcdCorebootMemFvSize));
 
   //
   // Create a memory allocation HOB.
   //
   BuildMemoryAllocationHob (
-    PcdGet32 (PcdOvmfMemFvBase),
-    PcdGet32 (PcdOvmfMemFvSize),
+    PcdGet32 (PcdCorebootMemFvBase),
+    PcdGet32 (PcdCorebootMemFvSize),
     EfiBootServicesData
     );
 

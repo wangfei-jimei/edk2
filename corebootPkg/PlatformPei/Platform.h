@@ -67,9 +67,4 @@ PeiFvInitialization (
   VOID
   );
 
-EFI_STATUS
-InitializeXen (
-  VOID
-  );
-
 #endif // _PLATFORM_PEI_H_INCLUDED_

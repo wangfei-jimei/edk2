@@ -13,7 +13,6 @@
 **/
 
 #include "BdsPlatform.h"
-#include "QemuBootOrder.h"
 
 
 //
@@ -22,8 +21,6 @@
 
 VOID          *mEfiDevPathNotifyReg;
 EFI_EVENT     mEfiDevPathEvent;
-VOID          *mEmuVariableEventReg;
-EFI_EVENT     mEmuVariableEvent;
 BOOLEAN       mDetectVgaOnly;
 
 
@@ -816,76 +813,6 @@ ConnectRecursivelyIfPciMassStorage (
   return EFI_SUCCESS;
 }
 
-
-/**
-  This notification function is invoked when the
-  EMU Variable FVB has been changed.
-
-  @param  Event                 The event that occured
-  @param  Context               For EFI compatiblity.  Not used.
-
-**/
-VOID
-EFIAPI
-EmuVariablesUpdatedCallback (
-  IN  EFI_EVENT Event,
-  IN  VOID      *Context
-  )
-{
-  DEBUG ((EFI_D_INFO, "EmuVariablesUpdatedCallback\n"));
-  UpdateNvVarsOnFileSystem ();
-}
-
-
-EFI_STATUS
-EFIAPI
-VisitingFileSystemInstance (
-  IN EFI_HANDLE  Handle,
-  IN VOID        *Instance,
-  IN VOID        *Context
-  )
-{
-  EFI_STATUS      Status;
-  STATIC BOOLEAN  ConnectedToFileSystem = FALSE;
-
-  if (ConnectedToFileSystem) {
-    return EFI_ALREADY_STARTED;
-  }
-
-  Status = ConnectNvVarsToFileSystem (Handle);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  ConnectedToFileSystem = TRUE;
-  mEmuVariableEvent =
-    EfiCreateProtocolNotifyEvent (
-      &gEfiDevicePathProtocolGuid,
-      TPL_CALLBACK,
-      EmuVariablesUpdatedCallback,
-      NULL,
-      &mEmuVariableEventReg
-      );
-  PcdSet64 (PcdEmuVariableEvent, (UINT64)(UINTN) mEmuVariableEvent);
-
-  return EFI_SUCCESS;
-}
-
-
-VOID
-PlatformBdsRestoreNvVarsFromHardDisk (
-  )
-{
-  VisitAllPciInstances (ConnectRecursivelyIfPciMassStorage);
-  VisitAllInstancesOfProtocol (
-    &gEfiSimpleFileSystemProtocolGuid,
-    VisitingFileSystemInstance,
-    NULL
-    );
-
-}
-
-
 VOID
 PlatformBdsConnectSequence (
   VOID
@@ -1068,12 +995,6 @@ Returns:
   ConnectRootBridge ();
 
   //
-  // Try to restore variables from the hard disk early so
-  // they can be used for the other BDS connect operations.
-  //
-  PlatformBdsRestoreNvVarsFromHardDisk ();
-
-  //
   // Init the time out value
   //
   Timeout = PcdGet16 (PcdPlatformBootTimeOut);
@@ -1128,11 +1049,6 @@ Returns:
   PlatformBdsConnectSequence ();
 
   //
-  // Process QEMU's -kernel command line option
-  //
-  TryRunningQemuKernel ();
-
-  //
   // Give one chance to enter the setup if we
   // have the time out
   //
@@ -1143,8 +1059,6 @@ Returns:
   DEBUG ((EFI_D_INFO, "BdsLibConnectAll\n"));
   BdsLibConnectAll ();
   BdsLibEnumerateAllBootOption (BootOptionList);
-
-  SetBootOrderFromQemu (BootOptionList);
 
   //
   // Please uncomment above ConnectAll and EnumerateAll code and remove following first boot

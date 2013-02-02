@@ -111,7 +111,7 @@ MemDetect (
   //
   // Determine the range of memory to use during PEI
   //
-  MemoryBase = PcdGet32 (PcdOvmfMemFvBase) + PcdGet32 (PcdOvmfMemFvSize);
+  MemoryBase = PcdGet32 (PcdCorebootMemFvBase) + PcdGet32 (PcdCorebootMemFvSize);
   MemorySize = LowerMemorySize - MemoryBase;
   if (MemorySize > SIZE_64MB) {
     MemoryBase = LowerMemorySize - SIZE_64MB;

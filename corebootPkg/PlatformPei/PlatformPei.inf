@@ -33,17 +33,15 @@
   Fv.c
   MemDetect.c
   Platform.c
-  Xen.c
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
-  OvmfPkg/OvmfPkg.dec
+  corebootPkg/corebootPkg.dec
 
 [Guids]
   gEfiMemoryTypeInformationGuid
-  gEfiXenInfoGuid
 
 [LibraryClasses]
   DebugLib
@@ -58,9 +56,8 @@
   PcdLib
 
 [Pcd]
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvBase
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvSize
-  gUefiOvmfPkgTokenSpaceGuid.PcdAcpiPmBaseAddress
+  gUefiCorebootPkgTokenSpaceGuid.PcdCorebootMemFvBase
+  gUefiCorebootPkgTokenSpaceGuid.PcdCorebootMemFvSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize

@@ -14,44 +14,17 @@
 ##
 
 ################################################################################
-!ifndef $(FD_SIZE_2MB)
-[FD.OVMF]
-BaseAddress   = 0xFFF00000
-Size          = 0x00100000
+[FD.coreboot]
+BaseAddress   = 0x800000|gUefiCorebootPkgTokenSpaceGuid.PcdCorebootMemFvBase
+Size          = 0x600000|gUefiCorebootPkgTokenSpaceGuid.PcdCorebootMemFvSize
 ErasePolarity = 1
 BlockSize     = 0x1000
-NumBlocks     = 0x100
+NumBlocks     = 0x600
 
-0x00000000|0x000EC000
-FV = FVMAIN_COMPACT
-
-0x000EC000|0x14000
+0x00000000|0x014000
 FV = SECFV
-!else
-[FD.OVMF]
-BaseAddress   = 0xFFE00000
-Size          = 0x00200000
-ErasePolarity = 1
-BlockSize     = 0x1000
-NumBlocks     = 0x200
 
-0x00000000|0x001CC000
-FV = FVMAIN_COMPACT
-
-0x001CC000|0x34000
-FV = SECFV
-!endif
-
-################################################################################
-
-[FD.MEMFD]
-BaseAddress   = 0x800000|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvBase
-Size          = 0x600000|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvSize
-ErasePolarity = 1
-BlockSize     = 0x10000
-NumBlocks     = 0x60
-
-0x0|0x600000
+0x00014000|0x5ec000
 FV = MAINFV
 
 ################################################################################
@@ -78,12 +51,10 @@ READ_LOCK_STATUS   = TRUE
 #
 # SEC Phase modules
 #
-# The code in this FV handles the initial firmware startup, and
-# decompresses the MAINFV which handles the majority of the boot sequence.
+# The code in this FV handles the initial startup, and locates MAINFV
+# which handles the majority of the boot sequence.
 #
-INF  OvmfPkg/Sec/SecMain.inf
-
-INF  RuleOverride=RESET_VECTOR UefiCpuPkg/ResetVector/Vtf0/Bin/ResetVector.inf
+INF  corebootPkg/Sec/SecMain.inf
 
 ################################################################################
 [FV.MAINFV]
@@ -124,7 +95,7 @@ APRIORI PEI {
 INF  MdeModulePkg/Core/Pei/PeiMain.inf
 INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
 INF  IntelFrameworkModulePkg/Universal/StatusCode/Pei/StatusCodePei.inf
-INF  OvmfPkg/PlatformPei/PlatformPei.inf
+INF  corebootPkg/PlatformPei/PlatformPei.inf
 INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
 FILE FV_IMAGE = A4EF5A93-3F1B-4232-A1C4-F0910E6D1D9C {
@@ -179,15 +150,11 @@ INF  PcAtChipsetPkg/KbcResetDxe/Reset.inf
 INF  MdeModulePkg/Universal/Metronome/Metronome.inf
 INF  PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
 
-INF  OvmfPkg/BlockMmioToBlockIoDxe/BlockIo.inf
-INF  OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
-INF  OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
 INF  OvmfPkg/EmuVariableFvbRuntimeDxe/Fvb.inf
 INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
   INF  SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableRuntimeDxe.inf
-  INF  OvmfPkg/SecureBootConfigDxe/SecureBootConfigDxe.inf
 !else
   INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 !endif
@@ -224,11 +191,8 @@ INF  IntelFrameworkModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2keyboardDxe.inf
 INF  IntelFrameworkModulePkg/Bus/Isa/IsaFloppyDxe/IsaFloppyDxe.inf
 
 INF  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
-INF  OvmfPkg/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
 
 INF  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
-INF  OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
-INF  RuleOverride=ACPITABLE OvmfPkg/AcpiTables/AcpiTables.inf
 
 INF  RuleOverride = BINARY FatBinPkg/EnhancedFatDxe/Fat.inf
 
@@ -280,36 +244,7 @@ INF  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 !ifdef $(CSM_ENABLE)
 INF  IntelFrameworkModulePkg/Csm/BiosThunk/VideoDxe/VideoDxe.inf
 INF  IntelFrameworkModulePkg/Csm/LegacyBiosDxe/LegacyBiosDxe.inf
-INF  RuleOverride=CSM OvmfPkg/Csm/Csm16/Csm16.inf
 !endif
-
-INF  OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf
-
-################################################################################
-
-[FV.FVMAIN_COMPACT]
-FvAlignment        = 16
-ERASE_POLARITY     = 1
-MEMORY_MAPPED      = TRUE
-STICKY_WRITE       = TRUE
-LOCK_CAP           = TRUE
-LOCK_STATUS        = TRUE
-WRITE_DISABLED_CAP = TRUE
-WRITE_ENABLED_CAP  = TRUE
-WRITE_STATUS       = TRUE
-WRITE_LOCK_CAP     = TRUE
-WRITE_LOCK_STATUS  = TRUE
-READ_DISABLED_CAP  = TRUE
-READ_ENABLED_CAP   = TRUE
-READ_STATUS        = TRUE
-READ_LOCK_CAP      = TRUE
-READ_LOCK_STATUS   = TRUE
-
-FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
-   SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
-     SECTION FV_IMAGE = MAINFV
-   }
- }
 
 ################################################################################
 
@@ -388,18 +323,8 @@ FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
     VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
 
-[Rule.Common.USER_DEFINED.ACPITABLE]
-  FILE FREEFORM = $(NAMED_GUID) {
-    RAW ACPI               |.acpi
-    RAW ASL                |.aml
-  }
-
 [Rule.Common.USER_DEFINED.CSM]
   FILE FREEFORM = $(NAMED_GUID) {
     RAW BIN                |.bin
   }
 
-[Rule.Common.SEC.RESET_VECTOR]
-  FILE RAW = $(NAMED_GUID) {
-    RAW RAW                |.raw
-  }
