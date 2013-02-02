@@ -208,7 +208,7 @@ class SourceFiles:
 
     source_files_common = {
         'binutils': {
-            'url': 'http://www.kernel.org/pub/linux/devel/binutils/' + \
+            'url': 'http://distfiles.macports.org/binutils/' + \
                    'binutils-$version.tar.bz2',
             'version': '2.20.51.0.5',
             'md5': '6d2de7cdf7a8389e70b124e3d73b4d37',
