@@ -27,7 +27,6 @@
 #include <Library/PeCoffLib.h>
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/PeCoffExtraActionLib.h>
-#include <Library/ExtractGuidedSectionLib.h>
 
 #include <Ppi/TemporaryRamSupport.h>
 
@@ -273,96 +272,6 @@ FindFfsFileAndSection (
 }
 
 /**
-  Locates the compressed main firmware volume and decompresses it.
-
-  @param[in,out]  Fv            On input, the firmware volume to search
-                                On output, the decompressed main FV
-
-  @retval EFI_SUCCESS           The file and section was found
-  @retval EFI_NOT_FOUND         The file and section was not found
-  @retval EFI_VOLUME_CORRUPTED  The firmware volume was corrupted
-
-**/
-EFI_STATUS
-EFIAPI
-DecompressGuidedFv (
-  IN OUT EFI_FIRMWARE_VOLUME_HEADER       **Fv
-  )
-{
-  EFI_STATUS                        Status;
-  EFI_GUID_DEFINED_SECTION          *Section;
-  UINT32                            OutputBufferSize;
-  UINT32                            ScratchBufferSize;
-  UINT16                            SectionAttribute;
-  UINT32                            AuthenticationStatus;
-  VOID                              *OutputBuffer;
-  VOID                              *ScratchBuffer;
-  EFI_FIRMWARE_VOLUME_IMAGE_SECTION *NewFvSection;
-  EFI_FIRMWARE_VOLUME_HEADER        *NewFv;
-
-  NewFvSection = (EFI_FIRMWARE_VOLUME_IMAGE_SECTION*) NULL;
-
-  Status = FindFfsFileAndSection (
-             *Fv,
-             EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE,
-             EFI_SECTION_GUID_DEFINED,
-             (EFI_COMMON_SECTION_HEADER**) &Section
-             );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Unable to find GUID defined section\n"));
-    return Status;
-  }
-
-  Status = ExtractGuidedSectionGetInfo (
-             Section,
-             &OutputBufferSize,
-             &ScratchBufferSize,
-             &SectionAttribute
-             );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Unable to GetInfo for GUIDed section\n"));
-    return Status;
-  }
-
-  //PcdGet32 (PcdOvmfMemFvBase), PcdGet32 (PcdOvmfMemFvSize)
-  OutputBuffer = (VOID*) ((UINT8*)(UINTN) PcdGet32 (PcdOvmfMemFvBase) + SIZE_1MB);
-  ScratchBuffer = ALIGN_POINTER ((UINT8*) OutputBuffer + OutputBufferSize, SIZE_1MB);
-  Status = ExtractGuidedSectionDecode (
-             Section,
-             &OutputBuffer,
-             ScratchBuffer,
-             &AuthenticationStatus
-             );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Error during GUID section decode\n"));
-    return Status;
-  }
-
-  Status = FindFfsSectionInSections (
-             OutputBuffer,
-             OutputBufferSize,
-             EFI_SECTION_FIRMWARE_VOLUME_IMAGE,
-             (EFI_COMMON_SECTION_HEADER**) &NewFvSection
-             );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Unable to find FV image in extracted data\n"));
-    return Status;
-  }
-
-  NewFv = (EFI_FIRMWARE_VOLUME_HEADER*)(UINTN) PcdGet32 (PcdOvmfMemFvBase);
-  CopyMem (NewFv, (VOID*) (NewFvSection + 1), PcdGet32 (PcdOvmfMemFvSize));
-
-  if (NewFv->Signature != EFI_FVH_SIGNATURE) {
-    DEBUG ((EFI_D_ERROR, "Extracted FV at %p does not have FV header signature\n", NewFv));
-    CpuDeadLoop ();
-    return EFI_VOLUME_CORRUPTED;
-  }
-
-  *Fv = NewFv;
-  return EFI_SUCCESS;
-}
-
-/**
   Locates the PEI Core entry point address
 
   @param[in]  Fv                 The firmware volume to search
@@ -427,8 +336,6 @@ FindPeiCoreImageBase (
   *PeiCoreImageBase = 0;
 
   FindMainFv (BootFv);
-
-  DecompressGuidedFv (BootFv);
 
   FindPeiCoreImageBaseInFv (*BootFv, PeiCoreImageBase);
 }

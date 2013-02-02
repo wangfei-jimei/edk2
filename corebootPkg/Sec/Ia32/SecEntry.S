@@ -40,6 +40,7 @@ ASM_PFX(_ModuleEntryPoint):
     # can reload to a better address.
     #
     movl    $BASE_512KB, %eax 
+    movl    $0x600000, %ebp
     movl    %eax, %esp
     nop
 
