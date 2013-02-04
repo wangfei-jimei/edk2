@@ -96,7 +96,6 @@ FindMainFv (
   )
 {
   EFI_FIRMWARE_VOLUME_HEADER  *Fv;
-  UINTN                       Distance;
 
   ASSERT (((UINTN) *BootFv & EFI_PAGE_MASK) == 0);
 
