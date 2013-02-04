@@ -23,11 +23,11 @@
   PLATFORM_GUID                  = 5c87b2d4-0bb9-4f50-a78d-e847089af9f4
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
-  OUTPUT_DIRECTORY               = Build/corebootIa32
-  SUPPORTED_ARCHITECTURES        = IA32
+  OUTPUT_DIRECTORY               = Build/coreboot$(ARCH)
+  SUPPORTED_ARCHITECTURES        = IA32|X64
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
-  FLASH_DEFINITION               = corebootPkg/corebootPkgIa32.fdf
+  FLASH_DEFINITION               = corebootPkg/corebootPkg.fdf
 
   #
   # Defines for default states.  These can be changed on the command line.
@@ -46,6 +46,11 @@
   INTEL:RELEASE_*_*_CC_FLAGS           = /D MDEPKG_NDEBUG
   MSFT:RELEASE_*_*_CC_FLAGS            = /D MDEPKG_NDEBUG
   GCC:*_*_*_CC_FLAGS                   = -mno-mmx -mno-sse
+!if $(SOURCE_DEBUG_ENABLE)
+  MSFT:*_*_X64_GENFW_FLAGS  = --keepexceptiontable
+  GCC:*_*_X64_GENFW_FLAGS   = --keepexceptiontable
+  INTEL:*_*_X64_GENFW_FLAGS = --keepexceptiontable
+!endif
 
 ################################################################################
 #
