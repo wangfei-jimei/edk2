@@ -35,6 +35,11 @@
   #
   DEFINE SECURE_BOOT_ENABLE      = FALSE
   DEFINE DEBUG_ON_SERIAL_PORT    = TRUE
+  DEFINE SOURCE_DEBUG_ENABLE     = FALSE
+  DEFINE CSM_ENABLE              = FALSE
+  DEFINE NETWORK_ENABLE          = FALSE
+  DEFINE BUILD_NEW_SHELL         = TRUE
+  DEFINE USE_NEW_SHELL           = FALSE
 
 [BuildOptions]
   GCC:RELEASE_*_*_CC_FLAGS             = -DMDEPKG_NDEBUG
@@ -96,7 +101,7 @@
   UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
   LockBoxLib|MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
 
-!ifdef $(SOURCE_DEBUG_ENABLE)
+!if $(SOURCE_DEBUG_ENABLE)
   PeCoffExtraActionLib|SourceLevelDebugPkg/Library/PeCoffExtraActionLibDebug/PeCoffExtraActionLibDebug.inf
   DebugCommunicationLib|SourceLevelDebugPkg/Library/DebugCommunicationLibSerialPort/DebugCommunicationLibSerialPort.inf
 !else
@@ -109,26 +114,26 @@
   DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
   CpuExceptionHandlerLib|MdeModulePkg/Library/CpuExceptionHandlerLibNull/CpuExceptionHandlerLibNull.inf
 
-!if $(SECURE_BOOT_ENABLE) == TRUE
+!if $(SECURE_BOOT_ENABLE)
   PlatformSecureLib|corebootPkg/Library/PlatformSecureLib/PlatformSecureLib.inf
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
 !endif
 
 [LibraryClasses.common]
-!if $(SECURE_BOOT_ENABLE) == TRUE
+!if $(SECURE_BOOT_ENABLE)
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
 !endif
 
 [LibraryClasses.common.SEC]
-!ifdef $(DEBUG_ON_SERIAL_PORT)
+!if $(DEBUG_ON_SERIAL_PORT)
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
 !else
   DebugLib|corebootPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
 !endif
   ReportStatusCodeLib|MdeModulePkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
   ExtractGuidedSectionLib|MdePkg/Library/BaseExtractGuidedSectionLib/BaseExtractGuidedSectionLib.inf
-!ifdef $(SOURCE_DEBUG_ENABLE)
+!if $(SOURCE_DEBUG_ENABLE)
   DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/SecPeiDebugAgentLib.inf
 !endif
   HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
@@ -145,7 +150,7 @@
   ReportStatusCodeLib|MdeModulePkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
   OemHookStatusCodeLib|MdeModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
-!ifdef $(DEBUG_ON_SERIAL_PORT)
+!if $(DEBUG_ON_SERIAL_PORT)
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
 !else
   DebugLib|corebootPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
@@ -161,7 +166,7 @@
   ReportStatusCodeLib|MdeModulePkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
   OemHookStatusCodeLib|MdeModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
-!ifdef $(DEBUG_ON_SERIAL_PORT)
+!if $(DEBUG_ON_SERIAL_PORT)
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
 !else
   DebugLib|corebootPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
@@ -169,7 +174,7 @@
   PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   PeiResourcePublicationLib|MdePkg/Library/PeiResourcePublicationLib/PeiResourcePublicationLib.inf
   ExtractGuidedSectionLib|MdePkg/Library/PeiExtractGuidedSectionLib/PeiExtractGuidedSectionLib.inf
-!ifdef $(SOURCE_DEBUG_ENABLE)
+!if $(SOURCE_DEBUG_ENABLE)
   DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/SecPeiDebugAgentLib.inf
 !endif
 
@@ -178,14 +183,14 @@
   DxeCoreEntryPoint|MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
   MemoryAllocationLib|MdeModulePkg/Library/DxeCoreMemoryAllocationLib/DxeCoreMemoryAllocationLib.inf
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
-!ifdef $(DEBUG_ON_SERIAL_PORT)
+!if $(DEBUG_ON_SERIAL_PORT)
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
 !else
   DebugLib|corebootPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
 !endif
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   ExtractGuidedSectionLib|MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
-!ifdef $(SOURCE_DEBUG_ENABLE)
+!if $(SOURCE_DEBUG_ENABLE)
   DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/DxeDebugAgentLib.inf
 !endif
 
@@ -194,14 +199,14 @@
   DxeCoreEntryPoint|MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   ReportStatusCodeLib|MdeModulePkg/Library/RuntimeDxeReportStatusCodeLib/RuntimeDxeReportStatusCodeLib.inf
-!ifdef $(DEBUG_ON_SERIAL_PORT)
+!if $(DEBUG_ON_SERIAL_PORT)
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
 !else
   DebugLib|corebootPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
 !endif
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
-!if $(SECURE_BOOT_ENABLE) == TRUE
+!if $(SECURE_BOOT_ENABLE)
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
 !endif
 
@@ -210,7 +215,7 @@
   DxeCoreEntryPoint|MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
-!ifdef $(DEBUG_ON_SERIAL_PORT)
+!if $(DEBUG_ON_SERIAL_PORT)
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
 !else
   DebugLib|corebootPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
@@ -224,7 +229,7 @@
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
-!ifdef $(DEBUG_ON_SERIAL_PORT)
+!if $(DEBUG_ON_SERIAL_PORT)
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
 !else
   DebugLib|corebootPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
@@ -238,7 +243,7 @@
 [LibraryClasses.common.UEFI_APPLICATION]
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
-!ifdef $(DEBUG_ON_SERIAL_PORT)
+!if $(DEBUG_ON_SERIAL_PORT)
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
 !else
   DebugLib|corebootPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
@@ -263,7 +268,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x10
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported|6
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeimPerFv|32
-!if $(SECURE_BOOT_ENABLE) == TRUE
+!if $(SECURE_BOOT_ENABLE)
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x10000
 !else
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x400
@@ -278,13 +283,13 @@
 
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x07
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
-!ifdef $(SOURCE_DEBUG_ENABLE)
+!if $(SOURCE_DEBUG_ENABLE)
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
 !else
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x2F
 !endif
 
-!ifdef $(SOURCE_DEBUG_ENABLE)
+!if $(SOURCE_DEBUG_ENABLE)
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugLoadImageMethod|0x2
 !endif
 
@@ -296,7 +301,7 @@
 !endif
 !endif
 
-!if $(SECURE_BOOT_ENABLE) == TRUE
+!if $(SECURE_BOOT_ENABLE)
   # override the default values from SecurityPkg to ensure images from all sources are verified in secure boot
   gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x05
   gEfiSecurityPkgTokenSpaceGuid.PcdFixedMediaImageVerificationPolicy|0x05
@@ -362,7 +367,7 @@
 
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
 
-!if $(SECURE_BOOT_ENABLE) == TRUE
+!if $(SECURE_BOOT_ENABLE)
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf {
     <LibraryClasses>
       NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificationLib.inf
@@ -392,7 +397,7 @@
   IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf {
     <LibraryClasses>
       TimerLib|corebootPkg/Library/AcpiTimerLib/AcpiTimerLib.inf
-!ifdef $(CSM_ENABLE)
+!if $(CSM_ENABLE)
       NULL|corebootPkg/Csm/CsmSupportLib/CsmSupportLib.inf
 !endif
   }
@@ -472,7 +477,7 @@
   MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
-!ifdef $(CSM_ENABLE)
+!if $(CSM_ENABLE)
   IntelFrameworkModulePkg/Csm/BiosThunk/VideoDxe/VideoDxe.inf
   IntelFrameworkModulePkg/Csm/LegacyBiosDxe/LegacyBiosDxe.inf
   corebootPkg/Csm/Csm16/Csm16.inf
@@ -505,7 +510,7 @@
   }
 !endif
 
-!if $(SECURE_BOOT_ENABLE) == TRUE
+!if $(SECURE_BOOT_ENABLE)
   SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableRuntimeDxe.inf {
     <LibraryClasses>
       BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
