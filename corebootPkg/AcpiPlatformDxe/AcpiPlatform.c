@@ -254,14 +254,7 @@ AcpiPlatformEntryPoint (
     return EFI_ABORTED;
   }
 
-  if (XenDetected ()) {
-    Status = InstallXenTables (AcpiTable);
-    if (EFI_ERROR (Status)) {
-      Status = FindAcpiTablesInFv (AcpiTable);
-    }
-  } else {
-    Status = FindAcpiTablesInFv (AcpiTable);
-  }
+  Status = FindAcpiTablesInFv (AcpiTable);
   if (EFI_ERROR (Status)) {
     return Status;
   }

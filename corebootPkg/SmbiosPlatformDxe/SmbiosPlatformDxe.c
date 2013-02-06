@@ -144,7 +144,9 @@ SmbiosTablePublishEntry (
 {
   EFI_STATUS                Status;
   EFI_SMBIOS_PROTOCOL       *Smbios;
+#if 0
   SMBIOS_TABLE_ENTRY_POINT  *EntryPointStructure;
+#endif
 
   //
   // Find the SMBIOS protocol
@@ -158,13 +160,13 @@ SmbiosTablePublishEntry (
     return Status;
   }
 
-  //
-  // Add Xen SMBIOS data if found
-  //
-  EntryPointStructure = GetXenSmbiosTables ();
+  // TODO: register coreboot SMBIOS tables with tianocore
+#if 0
+  EntryPointStructure = GetXenSmbiosTables (); <-- needs function that looks up system SMBIOS table
   if (EntryPointStructure != NULL) {
     Status = InstallAllStructures (Smbios, EntryPointStructure);
   }
+#endif
 
   return Status;
 }

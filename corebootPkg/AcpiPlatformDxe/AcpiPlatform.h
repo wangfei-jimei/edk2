@@ -50,16 +50,5 @@ QemuInstallAcpiTable (
   OUT  UINTN                         *TableKey
   );
 
-BOOLEAN
-XenDetected (
-  VOID
-  );
-
-EFI_STATUS
-EFIAPI
-InstallXenTables (
-  IN   EFI_ACPI_TABLE_PROTOCOL       *AcpiProtocol
-  );
-
 #endif
 

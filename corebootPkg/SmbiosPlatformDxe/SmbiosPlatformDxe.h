@@ -28,18 +28,6 @@
 
 
 /**
-  Locates the Xen SMBIOS data if it exists
-
-  @return SMBIOS_TABLE_ENTRY_POINT   Address of Xen SMBIOS data
-
-**/
-SMBIOS_TABLE_ENTRY_POINT *
-GetXenSmbiosTables (
-  VOID
-  );
-
-
-/**
   Validates the SMBIOS entry point structure
 
   @param  EntryPointStructure  SMBIOS entry point structure
