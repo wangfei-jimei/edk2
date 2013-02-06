@@ -286,6 +286,8 @@
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress|0x0
 
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUsePreExistingTables|TRUE
+
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x07
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
 !if $(SOURCE_DEBUG_ENABLE)

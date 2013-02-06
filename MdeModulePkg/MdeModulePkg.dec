@@ -639,6 +639,9 @@
   #
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialFifoControl|0x07|UINT8|0x00020005
 
+  ## Look for pre-existing tables (SMBIOS etc) when initializing their protocols
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUsePreExistingTables|FALSE|BOOLEAN|0x00020007
+
   ## Maximum address that the DXE Core will allocate the EFI_SYSTEM_TABLE_POINTER
   #  structure.  The default value for this PCD is 0, which means that the DXE Core
   #  will allocate the buffer from the EFI_SYSTEM_TABLE_POINTER structure on a 4MB

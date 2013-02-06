@@ -1053,6 +1053,11 @@ SmbiosTableConstruction (
   }
 }
 
+BOOLEAN
+FoundSmbiosTable() {
+  return FALSE;
+}
+
 /**
 
   Driver to produce Smbios protocol and pre-allocate 1 page for the final SMBIOS table. 
@@ -1074,76 +1079,81 @@ SmbiosDriverEntryPoint (
   EFI_STATUS            Status;
   EFI_PHYSICAL_ADDRESS  PhysicalAddress;
 
-  mPrivateData.Signature                = SMBIOS_INSTANCE_SIGNATURE;
-  mPrivateData.Smbios.Add               = SmbiosAdd;
-  mPrivateData.Smbios.UpdateString      = SmbiosUpdateString;
-  mPrivateData.Smbios.Remove            = SmbiosRemove;
-  mPrivateData.Smbios.GetNext           = SmbiosGetNext;
-  mPrivateData.Smbios.MajorVersion      = (UINT8) (FixedPcdGet16 (PcdSmbiosVersion) >> 8);
-  mPrivateData.Smbios.MinorVersion      = (UINT8) (FixedPcdGet16 (PcdSmbiosVersion) & 0x00ff);
+  if (FixedPcdGet32(PcdUsePreExistingTables) && FoundSmbiosTable()) {
+    /* Reuse existing table without copying */
+  } else {
 
-  InitializeListHead (&mPrivateData.DataListHead);
-  InitializeListHead (&mPrivateData.AllocatedHandleListHead);
-  EfiInitializeLock (&mPrivateData.DataLock, TPL_NOTIFY);
-
-  //
-  // Initialize the EntryPointStructure with initial values.
-  // Allocate memory (below 4GB).
-  //
-  PhysicalAddress = 0xffffffff;
-  Status = gBS->AllocatePages (
-                  AllocateMaxAddress,
-                  EfiReservedMemoryType,
-                  EFI_SIZE_TO_PAGES (sizeof (SMBIOS_TABLE_ENTRY_POINT)),
-                  &PhysicalAddress
-                  );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "SmbiosDriverEntryPoint() could not allocate EntryPointStructure < 4GB\n"));
+    mPrivateData.Signature                = SMBIOS_INSTANCE_SIGNATURE;
+    mPrivateData.Smbios.Add               = SmbiosAdd;
+    mPrivateData.Smbios.UpdateString      = SmbiosUpdateString;
+    mPrivateData.Smbios.Remove            = SmbiosRemove;
+    mPrivateData.Smbios.GetNext           = SmbiosGetNext;
+    mPrivateData.Smbios.MajorVersion      = (UINT8) (FixedPcdGet16 (PcdSmbiosVersion) >> 8);
+    mPrivateData.Smbios.MinorVersion      = (UINT8) (FixedPcdGet16 (PcdSmbiosVersion) & 0x00ff);
+  
+    InitializeListHead (&mPrivateData.DataListHead);
+    InitializeListHead (&mPrivateData.AllocatedHandleListHead);
+    EfiInitializeLock (&mPrivateData.DataLock, TPL_NOTIFY);
+  
+    //
+    // Initialize the EntryPointStructure with initial values.
+    // Allocate memory (below 4GB).
+    //
+    PhysicalAddress = 0xffffffff;
     Status = gBS->AllocatePages (
-                    AllocateAnyPages,
+                    AllocateMaxAddress,
                     EfiReservedMemoryType,
                     EFI_SIZE_TO_PAGES (sizeof (SMBIOS_TABLE_ENTRY_POINT)),
                     &PhysicalAddress
                     );
-   if (EFI_ERROR (Status)) {   
-      return EFI_OUT_OF_RESOURCES;
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "SmbiosDriverEntryPoint() could not allocate EntryPointStructure < 4GB\n"));
+      Status = gBS->AllocatePages (
+                      AllocateAnyPages,
+                      EfiReservedMemoryType,
+                      EFI_SIZE_TO_PAGES (sizeof (SMBIOS_TABLE_ENTRY_POINT)),
+                      &PhysicalAddress
+                      );
+     if (EFI_ERROR (Status)) {   
+        return EFI_OUT_OF_RESOURCES;
+      }
     }
-  }
-
-  EntryPointStructure = (SMBIOS_TABLE_ENTRY_POINT *) (UINTN) PhysicalAddress;
   
-  CopyMem (
-    EntryPointStructure,
-    &EntryPointStructureData,
-    sizeof (SMBIOS_TABLE_ENTRY_POINT)
-    );
-
-  //
-  // Pre-allocate 1 page for SMBIOS table below 4GB.
-  // SMBIOS table will be updated when new SMBIOS type is added or 
-  // existing SMBIOS type is updated. If the total size of SMBIOS table exceeds 1 page,
-  // we will re-allocate new memory when creating whole SMBIOS table.
-  //
-  PhysicalAddress = 0xffffffff;
-  Status = gBS->AllocatePages (
-                  AllocateMaxAddress,
-                  EfiReservedMemoryType,
-                  1,
-                  &PhysicalAddress
-                  );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "SmbiosDriverEntryPoint() could not allocate SMBIOS table < 4GB\n"));
-    EntryPointStructure->TableAddress = 0;
-  } else {
-    EntryPointStructure->TableAddress = (UINT32) PhysicalAddress;
-    mPreAllocatedPages = 1;
+    EntryPointStructure = (SMBIOS_TABLE_ENTRY_POINT *) (UINTN) PhysicalAddress;
+    
+    CopyMem (
+      EntryPointStructure,
+      &EntryPointStructureData,
+      sizeof (SMBIOS_TABLE_ENTRY_POINT)
+      );
+  
+    //
+    // Pre-allocate 1 page for SMBIOS table below 4GB.
+    // SMBIOS table will be updated when new SMBIOS type is added or 
+    // existing SMBIOS type is updated. If the total size of SMBIOS table exceeds 1 page,
+    // we will re-allocate new memory when creating whole SMBIOS table.
+    //
+    PhysicalAddress = 0xffffffff;
+    Status = gBS->AllocatePages (
+                    AllocateMaxAddress,
+                    EfiReservedMemoryType,
+                    1,
+                    &PhysicalAddress
+                    );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "SmbiosDriverEntryPoint() could not allocate SMBIOS table < 4GB\n"));
+      EntryPointStructure->TableAddress = 0;
+    } else {
+      EntryPointStructure->TableAddress = (UINT32) PhysicalAddress;
+      mPreAllocatedPages = 1;
+    }
+  
+    //
+    // Init TableLength to the length of End-Of-Table structure for SmbiosAdd() called at the first time
+    // to check the TableLength limitation.
+    //
+    EntryPointStructure->TableLength  = sizeof (EFI_SMBIOS_TABLE_END_STRUCTURE);
   }
-
-  //
-  // Init TableLength to the length of End-Of-Table structure for SmbiosAdd() called at the first time
-  // to check the TableLength limitation.
-  //
-  EntryPointStructure->TableLength  = sizeof (EFI_SMBIOS_TABLE_END_STRUCTURE);
   
   //
   // Make a new handle and install the protocol
