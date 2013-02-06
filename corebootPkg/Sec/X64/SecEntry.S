@@ -19,6 +19,7 @@
 
 
 #include <Base.h>
+#include <Library/PcdLib.h>
 
 #EXTERN ASM_PFX(SecCoreStartupWithStack)
 
@@ -27,16 +28,16 @@
 #
 # Processor is in flat protected mode
 #
-# @param[in]  RAX   Initial value of the EAX register (BIST: Built-in Self Test)
-# @param[in]  DI    'BP': boot-strap processor, or 'AP': application processor
-# @param[in]  RBP   Pointer to the start of the Boot Firmware Volume
-#
 # @return     None  This routine does not return
 #
 
+#define FV_OFFSET 0x64
+
 .data
+# these hacks are necessary because I haven't found a way to keep alignment
+# stable after SecMain is integrated into FV
 .align 0x1000
-.space 0x1000 - 0x64, 0
+.space 0x1000 - FV_OFFSET, 0
 pml4: # bits 47:39
     .quad pdpt + 3
 .space 0x1000 - 0x8, 0
@@ -114,9 +115,10 @@ realEntry:
     #
     # Load temporary stack top at very low memory.  The C code
     # can reload to a better address.
+    # Also load the base address of SECFV.
     #
     movq    $BASE_512KB, %rsp 
-    movq    $0x800000, %rbp
+    movq    $FixedPcdGet32(PcdCorebootMemFvBase), %rbp
     nop
 
     #
