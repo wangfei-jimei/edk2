@@ -708,67 +708,6 @@ Returns:
 }
 
 
-VOID
-PciInitialization (
-  )
-{
-  //
-  // Bus 0, Device 0, Function 0 - Host to PCI Bridge
-  //
-  PciWrite8 (PCI_LIB_ADDRESS (0, 0, 0, 0x3c), 0x00);
-
-  //
-  // Bus 0, Device 1, Function 0 - PCI to ISA Bridge
-  //
-  PciWrite8 (PCI_LIB_ADDRESS (0, 1, 0, 0x3c), 0x00);
-  PciWrite8 (PCI_LIB_ADDRESS (0, 1, 0, 0x60), 0x0b); // LNKA routing target
-  PciWrite8 (PCI_LIB_ADDRESS (0, 1, 0, 0x61), 0x0b); // LNKB routing target
-  PciWrite8 (PCI_LIB_ADDRESS (0, 1, 0, 0x62), 0x0a); // LNKC routing target
-  PciWrite8 (PCI_LIB_ADDRESS (0, 1, 0, 0x63), 0x0a); // LNKD routing target
-
-  //
-  // Bus 0, Device 1, Function 1 - IDE Controller
-  //
-  PciWrite8 (PCI_LIB_ADDRESS (0, 1, 1, 0x3c), 0x00);
-  PciWrite8 (PCI_LIB_ADDRESS (0, 1, 1, 0x0d), 0x40);
-
-  //
-  // Bus 0, Device 1, Function 3 - Power Managment Controller
-  //
-  PciWrite8 (PCI_LIB_ADDRESS (0, 1, 3, 0x3c), 0x09);
-  PciWrite8 (PCI_LIB_ADDRESS (0, 1, 3, 0x3d), 0x01); // INTA
-
-  //
-  // Bus 0, Device 2, Function 0 - Video Controller
-  //
-  PciWrite8 (PCI_LIB_ADDRESS (0, 2, 0, 0x3c), 0x00);
-
-  //
-  // Bus 0, Device 3, Function 0 - Network Controller
-  //
-  PciWrite8 (PCI_LIB_ADDRESS (0, 3, 0, 0x3c), 0x0a);
-  PciWrite8 (PCI_LIB_ADDRESS (0, 3, 0, 0x3d), 0x01); // INTA (-> LNKC)
-
-  //
-  // Bus 0, Device 5, Function 0 - RAM Memory
-  //
-  PciWrite8 (PCI_LIB_ADDRESS (0, 5, 0, 0x3c), 0x0b);
-  PciWrite8 (PCI_LIB_ADDRESS (0, 5, 0, 0x3d), 0x01); // INTA (-> LNKA)
-}
-
-
-VOID
-AcpiInitialization (
-  VOID
-  )
-{
-  //
-  // Set ACPI SCI_EN bit in PMCNTRL
-  //
-  IoOr16 ((PciRead32 (PCI_LIB_ADDRESS (0, 1, 3, 0x40)) & ~BIT0) + 4, BIT0);
-}
-
-
 EFI_STATUS
 EFIAPI
 ConnectRecursivelyIfPciMassStorage (
@@ -857,9 +796,6 @@ Returns:
   // Just use the simple policy to connect all devices
   //
   BdsLibConnectAll ();
-
-  PciInitialization ();
-  AcpiInitialization ();
 
   //
   // Clear the logo after all devices are connected.
