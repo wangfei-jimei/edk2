@@ -34,16 +34,13 @@
 #define FV_OFFSET 0x64
 
 .data
-# these hacks are necessary because I haven't found a way to keep alignment
-# stable after SecMain is integrated into FV
 .align 0x1000
-.space 0x1000 - FV_OFFSET, 0
 pml4: # bits 47:39
     .quad pdpt + 3
-.space 0x1000 - 0x8, 0
+.align 0x1000
 pdpt: # bits 38:29
     .quad pdt + 3
-.space 0x1000 - 0x8, 0
+.align 0x1000
 pdt: # bits 29:21
 .space 0x1000, 0
 
