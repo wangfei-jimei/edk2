@@ -94,7 +94,7 @@ FindTableAt (
     struct cb_record *rec = (struct cb_record *)ptr;
     switch (rec->tag) {
     case CB_TAG_FORWARD:
-      FindTableAt((void *)(unsigned long)((struct cb_forward *)rec)->forward);
+      FindTableAt((void *)((struct cb_forward *)rec)->forward);
       return;
     case CB_TAG_MEMORY:
       ParseMemory((struct cb_memory *)ptr);
