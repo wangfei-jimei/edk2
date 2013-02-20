@@ -33,7 +33,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-  OvmfPkg/OvmfPkg.dec
+  corebootPkg/corebootPkg.dec
 
 [LibraryClasses]
   BaseMemoryLib
@@ -44,7 +44,7 @@
   DebugPrintErrorLevelLib
 
 [Pcd]
-  gUefiOvmfPkgTokenSpaceGuid.PcdDebugIoPort                ## CONSUMES
+  gUefiCorebootPkgTokenSpaceGuid.PcdDebugIoPort                ## CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue        ## CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask            ## CONSUMES
 

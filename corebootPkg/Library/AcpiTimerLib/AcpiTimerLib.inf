@@ -33,10 +33,10 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-  OvmfPkg/OvmfPkg.dec
+  corebootPkg/corebootPkg.dec
 
 [Pcd]
-  gUefiOvmfPkgTokenSpaceGuid.PcdAcpiPmBaseAddress
+  gUefiCorebootPkgTokenSpaceGuid.PcdAcpiPmBaseAddress
 
 [LibraryClasses]
   BaseLib

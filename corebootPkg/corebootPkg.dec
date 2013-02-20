@@ -25,3 +25,11 @@
 [PcdsFixedAtBuild]
   gUefiCorebootPkgTokenSpaceGuid.PcdCorebootMemFvBase|0x0|UINT32|0
   gUefiCorebootPkgTokenSpaceGuid.PcdCorebootMemFvSize|0x0|UINT32|1
+
+  ## This flag is used to control the destination port for PlatformDebugLibIoPort
+  gUefiCorebootPkgTokenSpaceGuid.PcdDebugIoPort|0x402|UINT16|4
+
+  ## This flag determines the Power Management Base Address of choice, written
+  #  to PIIX4 function 3 offset 0x40-0x43 bits [15:6].
+  gUefiCorebootPkgTokenSpaceGuid.PcdAcpiPmBaseAddress|0xB000|UINT16|5
+
